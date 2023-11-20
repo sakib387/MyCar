@@ -17,6 +17,6 @@ class Profile(models.Model):
     photo=models.ImageField(null=True)
     bio=models.CharField(max_length=140,blank=True)
     phone_number=models.CharField(max_length=12,blank=True)
-    location=models.OneToOneField(Location,on_delete=models.CASCADE,null=True)
+    location=models.OneToOneField(Location,on_delete=models.SET_NULL,null=True)
     def __str__(self):
         return self.user.username

@@ -20,3 +20,4 @@ class Profile(models.Model):
     location=models.OneToOneField(Location,on_delete=models.SET_NULL,null=True)
     def __str__(self):
         return self.user.username
+    

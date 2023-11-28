@@ -4,7 +4,7 @@ from localflavor.us.forms import USZipCodeField
 
 
 class locationForm(forms.ModelForm):
-    address_1 = forms.CharField(required=True)
+    
     zip_code = USZipCodeField(required=True)
     class Meta:
         model=Location

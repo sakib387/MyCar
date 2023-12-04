@@ -5,6 +5,7 @@ from .models import Listing
 from .forms import ListingForm
 from users.froms import locationForm
 from django.contrib import messages
+from .filters import ListingFilter
 # Create your views here.
 
 def lending_page(request):
@@ -13,9 +14,10 @@ def lending_page(request):
 @login_required
 def home_view(request):
     listing=Listing.objects.all()
-    print(listing)
+    listing_filter = ListingFilter(request.GET, queryset=listing)
     context={
-        'listing':listing
+        'listing':listing,
+        'listing_filter':listing_filter
     }
     return render(request,"views/home.html",context)
 

@@ -3,7 +3,7 @@ from django.shortcuts import render,HttpResponse,redirect
 from django.contrib.auth.decorators import login_required
 from .models import Listing
 from .forms import ListingForm
-from users.froms import locationForm
+from users.froms import LocationForm
 from django.contrib import messages
 from .filters import ListingFilter
 # Create your views here.
@@ -26,7 +26,7 @@ def list_view(request):
     if request.method=='POST':
          try:
             listing_form = ListingForm(request.POST, request.FILES)
-            location_form = locationForm(request.POST, )
+            location_form = LocationForm(request.POST, )
             if listing_form.is_valid() and location_form.is_valid():
                 listing = listing_form.save(commit=False)
                 listing_location = location_form.save()
@@ -44,7 +44,7 @@ def list_view(request):
                 request, 'An error occured while posting the listing.')
     elif request.method=='GET':
         listing_form=ListingForm()
-        location_form=locationForm()
+        location_form=LocationForm()
     return render (request,'views/list.html',{'listing_form':listing_form,'location_form':location_form})
 
 @login_required
@@ -57,4 +57,41 @@ def listing_view(request,id):
     except Exception as e:
         messages.error(request, f'Invalid UID {id} was provided for listing.')
         return redirect('home')
+    
+
+
+@login_required
+def edit_view(request, id):
+    try:
+        listing = Listing.objects.get(id=id)
+        if listing is None:
+            raise Exception
+        if request.method == 'POST':
+            listing_form = ListingForm(
+                request.POST, request.FILES, instance=listing)
+            location_form = LocationForm(
+                request.POST, instance=listing.locaton)
+            if listing_form.is_valid and location_form.is_valid:
+                listing_form.save()
+                location_form.save()
+                messages.info(request, f'Listing {id} updated successfully!')
+                return redirect('home')
+            else:
+                messages.error(
+                    request, f'An error occured while trying to edit the listing.')
+                return reload()
+        else:
+            listing_form = ListingForm(instance=listing)
+            location_form = LocationForm(instance=listing.locaton)
+        context = {
+            'location_form': location_form,
+            'listing_form': listing_form
+        }
+        return render(request, 'views/edit.html', context)
+    except Exception as e:
+        messages.error(
+            request, f'An error occured while trying to access the edit page')
+        return redirect('home')
+
+
         

@@ -2,7 +2,7 @@ from django import forms
 from .models import Location
 from localflavor.us.forms import USZipCodeField
 from .models import Profile,User
-
+from .widgets import CustomPictureImageFieldWidget
 class LocationForm(forms.ModelForm):
     
     zip_code = USZipCodeField(required=True)
@@ -11,7 +11,7 @@ class LocationForm(forms.ModelForm):
         fields="__all__"
 
 class ProfileForm(forms.ModelForm):
-    #photo = forms.ImageField(widget=CustomPictureImageFieldWidget)
+    photo = forms.ImageField(widget=CustomPictureImageFieldWidget)
     bio = forms.TextInput()
 
     class Meta:

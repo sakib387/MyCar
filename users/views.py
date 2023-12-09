@@ -5,7 +5,7 @@ from django.contrib.auth import authenticate,login,logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .froms import UserForm,ProfileForm,LocationForm
-from main.models import Listing
+from main.models import Listing,LikedListing
 # Create your views here.
 def login_page(request):
     if request.method=='POST':
@@ -56,12 +56,14 @@ def Register_page(request):
 def profile_view(request):
     if request.method=='GET':
         user_listings=Listing.objects.filter(seller=request.user.profile)
+        user_like_listings=LikedListing.objects.filter(profile=request.user.profile).all()
         user_form=UserForm(instance=request.user)
         profile_form=ProfileForm(instance=request.user.profile)
         location_from=LocationForm(instance=request.user.profile.location)
-        return render(request,'views/profile.html',{'user_form':user_form,'profile_form':profile_form,'location_form':location_from,'user_listings':user_listings})
+        return render(request,'views/profile.html',{'user_form':user_form,'profile_form':profile_form,'location_form':location_from,'user_listings':user_listings,'user_liked_listings':user_like_listings})
     if request.method=='POST':
         user_form=UserForm(request.POST,instance=request.user)
+        user_like_listings=LikedListing.objects.filter(profile=request.user.profile).all()
         profile_form=ProfileForm(request.POST,request.FILES,instance=request.user.profile)
         location_from=LocationForm(request.POST,instance=request.user.profile.location)
         if user_form.is_valid() and profile_form.is_valid() and location_from.is_valid():
@@ -72,4 +74,4 @@ def profile_view(request):
             return redirect('profile')
         else:
             messages.error(request, 'Error Updating Profile!')
-        return render(request,'views/profile.html',{'user_form':user_form,'profile_form':profile_form,'location_form':location_from})
+        return render(request,'views/profile.html',{'user_form':user_form,'profile_form':profile_form,'location_form':location_from,'user_liked_listings':user_like_listings})

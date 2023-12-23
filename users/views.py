@@ -75,3 +75,4 @@ def profile_view(request):
         else:
             messages.error(request, 'Error Updating Profile!')
         return render(request,'views/profile.html',{'user_form':user_form,'profile_form':profile_form,'location_form':location_from,'user_liked_listings':user_like_listings})
+    

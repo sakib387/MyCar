@@ -8,4 +8,5 @@ urlpatterns = [
     path('list',views.list_view,name='list'),
     path('listing/<str:id>',views.listing_view,name="listing"),
     path('listing/<str:id>/edit/', views.edit_view, name='edit'),
+    path('listing/<str:id>/like/', views.like_listing_view, name='like'),
 ]

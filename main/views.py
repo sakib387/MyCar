@@ -1,4 +1,5 @@
-from django.shortcuts import render,HttpResponse,redirect
+from django.shortcuts import render,HttpResponse,redirect,get_object_or_404
+from django.http import HttpResponse, JsonResponse
 
 from django.contrib.auth.decorators import login_required
 from .models import Listing
@@ -6,6 +7,7 @@ from .forms import ListingForm
 from users.froms import LocationForm
 from django.contrib import messages
 from .filters import ListingFilter
+from .models import LikedListing
 # Create your views here.
 
 def lending_page(request):
@@ -15,9 +17,12 @@ def lending_page(request):
 def home_view(request):
     listing=Listing.objects.all()
     listing_filter = ListingFilter(request.GET, queryset=listing)
-    context={
-        'listing':listing,
-        'listing_filter':listing_filter
+    user_liked_listings = LikedListing.objects.filter(
+        profile=request.user.profile).values_list('listing')
+    liked_listings_ids = [l[0] for l in user_liked_listings]
+    context = {
+        'listing_filter': listing_filter,
+        'liked_listings_ids': liked_listings_ids,
     }
     return render(request,"views/home.html",context)
 
@@ -94,4 +99,18 @@ def edit_view(request, id):
         return redirect('home')
 
 
-        
+
+@login_required
+def like_listing_view(request,id):
+    listing=get_object_or_404(Listing,id=id)
+    liked_listing,created=LikedListing.objects.get_or_create(
+        profile=request.user.profile,listing=listing
+    )
+
+    if not created:
+        liked_listing.delete()
+    else:
+        liked_listing.save()
+    return JsonResponse({
+        'is_liked_by_user':created,
+    })
